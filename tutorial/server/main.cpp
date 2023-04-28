@@ -9,8 +9,8 @@
 int main()
 {
     std::shared_ptr<ServerSample> s1 = std::make_shared<ServerSample>();
-    //s1->Func02();
-    s1->Multicast();
+    s1->Func02();
+    //s1->Multicast();
     getchar();
     return 0;
 }

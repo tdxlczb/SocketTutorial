@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <chrono>
 #include <ctime>
+#include <string>
+#include "socket_define.h"
 
 struct timeval;
 
@@ -14,6 +16,8 @@ void InitSocket();
 void FinishSocket();
 
 timeval CastDuration(const std::chrono::microseconds& duration);
+
+bool GetSocketAddr(SOCKET socket, std::string& addr, uint16_t& port);
 
 }// namespace u2socket
 }// namespace tdxl
