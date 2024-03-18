@@ -7,6 +7,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
+#include "tcp_client_example.h"
 
 void GetHostTest()
 {
@@ -30,9 +31,10 @@ void GetHostTest()
 
 int main()
 {
-    std::shared_ptr<ClientSample> s1 = std::make_shared<ClientSample>();
+    examples::TcpClientDemo01();
+    //std::shared_ptr<ClientSample> s1 = std::make_shared<ClientSample>();
     //s1->Func02();
-    s1->Multicast();
+    //s1->Multicast();
     getchar();
     return 0;
 }

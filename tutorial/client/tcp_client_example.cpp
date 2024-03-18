@@ -24,10 +24,10 @@ void TcpClientDemo01()
 
     //指定准备连接的服务端ip和port
     sockaddr_in serverAddr;
-    memset(&serverAddr, 0, sizeof(serverAddr));             //对象初始化，每个字节都用0填充
-    serverAddr.sin_family      = AF_INET;                   //使用IPv4地址
-    serverAddr.sin_addr.s_addr = inet_addr("172.20.91.42"); //具体的IP地址
-    serverAddr.sin_port        = htons(51234);              //端口
+    memset(&serverAddr, 0, sizeof(serverAddr));              //对象初始化，每个字节都用0填充
+    serverAddr.sin_family      = AF_INET;                    //使用IPv4地址
+    serverAddr.sin_addr.s_addr = inet_addr("172.20.91.250"); //具体的IP地址
+    serverAddr.sin_port        = htons(49527);               //端口
     //serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);         //本机的所有ip，即0.0.0.0
     //serverAddr.sin_port        = htons(0);                  //端口为0表示让系统自动选择可用端口
 
@@ -50,32 +50,32 @@ void TcpClientDemo01()
     long num = 0;
     while (true)
     {
-        num++;
-        //发送数据
-        char sendBuff[MAXBYTE] = {0};
-        sprintf_s(sendBuff, "%ld", num);
-        int sendRet = send(clientSocket, sendBuff, strlen(sendBuff), NULL);
-        if (SOCKET_ERROR == sendRet)
-        {
-            std::cout << "send data failed, errCode=" << WSAGetLastError() << std::endl;
-        }
-        else
-        {
-            std::cout << "send size=" << sendRet << ", data=" << sendBuff << std::endl;
-        }
-        Sleep(2000);
-
-        ////接收数据
-        //char recvBuff[MAXBYTE] = {0};
-        //int  recvRet           = recv(clientSocket, recvBuff, sizeof(recvBuff), NULL);
-        //if (SOCKET_ERROR == recvRet)
+        //num++;
+        ////发送数据
+        //char sendBuff[MAXBYTE] = {0};
+        //sprintf_s(sendBuff, "%ld", num);
+        //int sendRet = send(clientSocket, sendBuff, strlen(sendBuff), NULL);
+        //if (SOCKET_ERROR == sendRet)
         //{
-        //    std::cout << "recv data failed, errCode=" << WSAGetLastError() << std::endl;
+        //    std::cout << "send data failed, errCode=" << WSAGetLastError() << std::endl;
         //}
         //else
         //{
-        //    std::cout << "recv size=" << recvRet << ", data=" << recvBuff << std::endl;
+        //    std::cout << "send size=" << sendRet << ", data=" << sendBuff << std::endl;
         //}
+        //Sleep(2000);
+
+        //接收数据
+        char recvBuff[MAXBYTE] = {0};
+        int  recvRet           = recv(clientSocket, recvBuff, sizeof(recvBuff), NULL);
+        if (SOCKET_ERROR == recvRet)
+        {
+            std::cout << "recv data failed, errCode=" << WSAGetLastError() << std::endl;
+        }
+        else
+        {
+            std::cout << "recv size=" << recvRet << ", data=" << recvBuff << std::endl;
+        }
     }
     //关闭套接字
     closesocket(clientSocket);
@@ -209,6 +209,18 @@ void TcpClientDemo02()
 
     //关闭套接字
     closesocket(clientSocket);
+}
+
+void SocketPing(const std::string& ip, int count)
+{
+    WSADATA wsaData;
+    int     err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (err != 0)
+    {
+        std::cout << "WSAStartup failed with error: " << err << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
 }
 
 } // namespace examples

@@ -44,15 +44,28 @@ timeval CastDuration(const std::chrono::microseconds& duration)
     return time;
 }
 
-bool GetSocketAddr(SOCKET socket, std::string& addr, uint16_t& port)
+bool GetSocketAddr(SOCKET socket, bool bLocal, std::string& addr, uint16_t& port)
 {
+    //getsockname函数用于获取与某个套接字关联的本地协议地址
+    //getpeername函数用于获取与某个套接字关联的外地协议地址
     sockaddr_in socketAddr;
     memset(&socketAddr, 0, sizeof(socketAddr)); //对象初始化，每个字节都用0填充
     int addrLen = sizeof(socketAddr);
-    if (SOCKET_ERROR == getsockname(socket, (sockaddr*) &socketAddr, &addrLen))
+    if (bLocal)
     {
-        std::cout << "getsockname failed, error=" << WSAGetLastError() << std::endl;
-        return false;
+        if (SOCKET_ERROR == getsockname(socket, (sockaddr*) &socketAddr, &addrLen))
+        {
+            std::cout << "getsockname failed, error=" << WSAGetLastError() << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        if (SOCKET_ERROR == getpeername(socket, (sockaddr*) &socketAddr, &addrLen))
+        {
+            std::cout << "getpeername failed, error=" << WSAGetLastError() << std::endl;
+            return false;
+        }
     }
     addr = inet_ntoa(socketAddr.sin_addr);
     port = ntohs(socketAddr.sin_port);

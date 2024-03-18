@@ -45,7 +45,7 @@ void ServerSample::Func01()
     memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都用0填充
     sockAddr.sin_family = AF_INET;  //使用IPv4地址
     sockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");  //具体的IP地址
-    sockAddr.sin_port = htons(51772);  //端口
+    sockAddr.sin_port = htons(51234);  //端口
      //sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);  //具体的IP地址
      //sockAddr.sin_port = htons(0);  //端口
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
@@ -59,12 +59,12 @@ void ServerSample::Func01()
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     int len = sizeof(addr);
-    int ret = getsockname(servSock, (sockaddr*)&addr, &len);
+    int ret = getpeername(clntSock, (sockaddr *) &addr, &len);
     if (ret != 0)
     {
         printf("getsockname Error!\n");
     }
-    printf("servSock address = %s:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+    printf("clntSock address = %s:%d\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 
     while (true)
     {
@@ -147,34 +147,24 @@ void ServerSample::Func02()
                     //}
                     char buffer[1024];
                     memset(buffer, 0, 1024);
-                    int nRecev = recv(fdSocket.fd_array[i], buffer, 1024, 0);
-                    struct sockaddr_in addr;
-                    memset(&addr, 0, sizeof(addr));
-                    int len = sizeof(addr);
-                    int ret = getsockname(fdSocket.fd_array[i], (sockaddr*)&addr, &len);
-                    if (ret != 0)
+                    int         nRecev = recv(fdSocket.fd_array[i], buffer, 1024, 0);
+                    std::string addr   = "";
+                    uint16_t    port   = 0;
+                    if (!tdxl::u2socket::GetSocketAddr(fdSocket.fd_array[i], false, addr, port))
                     {
                         printf("getsockname error!\n");
                     }
                     if (nRecev > 0)
                     {
                         std::string timestring = Zeus::GetNowString();
-                        printf("[%s]received client [%s:%d] msg:%s\n", timestring.data(), inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), buffer);
+                        printf("[%s]received client [%s:%d] msg:%s\n", timestring.data(), addr.c_str(), port, buffer);
                         //send(fdSocket.fd_array[i], buffer, strlen(buffer), 0);
                         //char *str = "Hello World!";
                         //send(fdSocket.fd_array[i], str, strlen(str) + sizeof(char), NULL);
                     }
                     else
                     {
-                        struct sockaddr_in addr;
-                        memset(&addr, 0, sizeof(addr));
-                        int len = sizeof(addr);
-                        int ret = getsockname(fdSocket.fd_array[i], (sockaddr*)&addr, &len);
-                        if (ret != 0)
-                        {
-                            printf("getsockname Error!\n");
-                        }
-                        printf("client [%s:%d] disconnected\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+                        printf("client [%s:%d] disconnected\n", addr.c_str(), port);
                         closesocket(fdSocket.fd_array[i]);
                         FD_CLR(fdSocket.fd_array[i], &fdSocket);
                     }
